@@ -105,10 +105,8 @@ bool JumpList::find(const string& s) const {
 		else if (tmp->data_ > s) return false; // went past without finding s
 		else tmp = tmp->next_;
 	}
-
 	return false; // end of list
 }
-
 
 string JumpList::get(int i) const {
 	string output = "";
@@ -162,7 +160,7 @@ string JumpList::prettyPrint() const {
 	Node* tmp = head_;
 	const int distanceBetweenNodes = 5;// space for the " --> "
 	const int space = 3;
-	int nodeSize = 0;    // Tracks size of total node strings
+	int nodeSize = 0;    // tracks size of total node strings
 	int nodeGap = 0;
 	while (tmp != nullptr) {
 		if(tmp->gap_ ==0 && tmp->next_!=nullptr) {
@@ -177,12 +175,12 @@ string JumpList::prettyPrint() const {
 			if (tmp == head_) {
 				nodeGap = tmp->gap_;
 				jmpNodeStr += tmp->data_;
-				jmpNodeGapStr += tmp->gap_ ;
+				jmpNodeGapStr += std::to_string(tmp->gap_);
 			} else {
 				int distanceBetweenJumpNodes = nodeGap * distanceBetweenNodes + nodeSize;
-				//jmpNodeGapStr +=std::string result(distanceBetweenJumpNodes,' ')+ tmp->gap_;
+				jmpNodeGapStr += std::string(distanceBetweenJumpNodes, ' ') +std::to_string(tmp->gap_);
 				distanceBetweenJumpNodes -= space;
-				// Add a dashed line to represent the jump distance
+				// add a dashed line to represent the jump distance
 				jmpNodeStr += " " + std::string(distanceBetweenJumpNodes, '-') + "> ";
 				jmpNodeStr += tmp->data_;
 				nodeGap = tmp->gap_;
@@ -191,7 +189,6 @@ string JumpList::prettyPrint() const {
 		}
 		tmp = tmp->next_;
 	}
-
 	return nodeStr + "\n" + jmpNodeStr + "\n" + jmpNodeGapStr;
 }
 
