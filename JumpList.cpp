@@ -1,5 +1,6 @@
 #include "JumpList.h"
 
+#include <iomanip>
 #include <iostream>
 #include <stdexcept>
 
@@ -159,102 +160,73 @@ string JumpList::prettyPrint() const {
 	string jmpNodeStr;
 	string jmpNodeGapStr;
 	Node* tmp = head_;
-
+	const int distanceBetweenNodes = 5;// space for the " --> "
+	const int space = 3;
+	int nodeSize = 0;    // Tracks size of total node strings
+	int nodeGap = 0;
 	while (tmp != nullptr) {
-		if(tmp == head_) {
-			nodeStr += tmp->data_ ;
-		}else{
-			nodeStr += " --> " +tmp->data_ ;
+		if(tmp->gap_ ==0 && tmp->next_!=nullptr) {
+			nodeSize += tmp->data_.size();
 		}
-		tmp = tmp->next_;
-	}
-
-	tmp=head_;
-	while (tmp != nullptr) {
+		if (tmp == head_) {
+			nodeStr += tmp->data_;
+		} else {
+			nodeStr += " --> " + tmp->data_;
+		}
 		if (tmp->gap_ != 0 || tmp->jump_ != nullptr) {
-			int numberOfDashes = tmp->gap_;
-			if(tmp==head_) {
-				jmpNodeStr +=tmp->data_ + " ";
+			if (tmp == head_) {
+				nodeGap = tmp->gap_;
+				jmpNodeStr += tmp->data_;
+				jmpNodeGapStr += tmp->gap_ ;
+			} else {
+				int distanceBetweenJumpNodes = nodeGap * distanceBetweenNodes + nodeSize;
+				//jmpNodeGapStr +=std::string result(distanceBetweenJumpNodes,' ')+ tmp->gap_;
+				distanceBetweenJumpNodes -= space;
+				// Add a dashed line to represent the jump distance
+				jmpNodeStr += " " + std::string(distanceBetweenJumpNodes, '-') + "> ";
+				jmpNodeStr += tmp->data_;
+				nodeGap = tmp->gap_;
 			}
-			string arrow = string(numberOfDashes, '---');
-			jmpNodeStr += arrow + "> " +tmp->data_ + " ";
-			jmpNodeGapStr += std::to_string(tmp->gap_) + " ";
+			nodeSize=0;
 		}
 		tmp = tmp->next_;
-
 	}
-	return nodeStr + "\n" + jmpNodeStr + "\n" + jmpNodeGapStr;
 
+	return nodeStr + "\n" + jmpNodeStr + "\n" + jmpNodeGapStr;
 }
 
+bool JumpList::insert(const string& data) {
+	Node* temporaryNode = head_;
+	Node* previousNode;
+	Node* previousJumpNode;
 
-bool JumpList::insert(const string& s) {
-	// Edge case: empty list
-	if (head_ == nullptr) {
-		head_ = new Node(s, nullptr, nullptr, 1);
-		return true;
-	}
-
-	// Check for 0.001 probability of non-insertion (simulating AI behavior if required)
-	if (static_cast<double>(rand()) / RAND_MAX < 0.001) {
+	if(find(data)) {
 		return false;
 	}
 
-	Node* prev = nullptr;
-	Node* tmp = head_;
+	//find location for alphabet
 
-	// Use jump pointers to find the segment
-	while (tmp->jump_ != nullptr && tmp->jump_->data_ < s) {
-		prev = tmp;
-		tmp = tmp->jump_;
-	}
+	//setup
+	while(temporaryNode != nullptr) {
+		if (temporaryNode->gap_ != 0 || temporaryNode->jump_ != nullptr) {
+			if(temporaryNode->data_ < data) {
+				previousJumpNode= temporaryNode;
+				if(previousJumpNode->gap_ <5){
+					previousJumpNode->gap_ += 1;
+				}else if(previousJumpNode->gap_ >=5) {
 
-	// Now use next pointers within the found segment to find the insertion point
-	while (tmp->next_ != nullptr && tmp->next_->data_ < s) {
-		prev = tmp;
-		tmp = tmp->next_;
-	}
-
-	// If s is already in the list, do not insert and return false
-	if (tmp->data_ == s || (tmp->next_ && tmp->next_->data_ == s)) {
-		return false;
-	}
-
-	// Insert the new node in order
-	Node* newNode = new Node(s, tmp->next_, nullptr, 0);  // New node's jump is null for now
-	tmp->next_ = newNode;
-
-	// Check if the segment exceeds MAX_GAP_SIZE and split if needed
-	int segmentSize = 1;
-	tmp = head_;
-
-	while (tmp != nullptr) {
-		Node* segmentStart = tmp;
-		int count = 0;
-
-		// Count nodes in this segment until jump or end
-		while (tmp != nullptr && (tmp->jump_ == nullptr || count < tmp->gap_)) {
-			tmp = tmp->next_;
-			count++;
-		}
-
-		// If segment size exceeds MAX_GAP_SIZE, split it
-		if (count > MAX_GAP_SIZE) {
-			int splitPoint = (count + 1) / 2;
-			Node* mid = segmentStart;
-
-			for (int i = 1; i < splitPoint; i++) {
-				mid = mid->next_;
+				}
 			}
-
-			// Update jump pointers and gaps
-			mid->jump_ = tmp;
-			segmentStart->gap_ = splitPoint;
-			mid->gap_ = count - splitPoint;
 		}
+		if(temporaryNode->data_ < data) {
+			if(temporaryNode->data_ == data) {
+				previousNode = temporaryNode;
+				Node nodeToInsert = Node(data, previousNode->next_, nullptr, 0);
+				Node* nodeToInsertMutable = &nodeToInsert;
+			}
+		}
+		temporaryNode = temporaryNode->next_;
 	}
-
-	return true;
 }
 
 
