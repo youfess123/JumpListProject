@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 Node::Node(const string& s, Node* next, Node* jump, int gap){
-	data_= s;
+	data_= s;  //initialise Node with parameters
 	next_ = next;
     jump_ = jump;
     gap_ = gap;
@@ -17,16 +17,14 @@ Node::~Node() {
 
 }
 
-
 JumpList::JumpList() {
-	head_ = nullptr;
+	head_ = nullptr; //initialise empty list
 }
 
-// DO NOT CHANGE
-// You do not need to understand the code here to complete the assignment
 JumpList::JumpList(int size, const string* arr) {
-
-	const string s[] = {"a", "b", "blah", "c", "cat", "d", "etc", "ooo...", "x", "zzz"};
+	// DO NOT CHANGE
+	// You do not need to understand the code here to complete the assignment
+	const string s[] = {"a", "b", "blah", "C", "cat", "d", "etc", "ooo...", "x", "zzz"};
 	const string* sp = (arr == nullptr) ? s : arr;
 
 	Node** npp = new Node*[size];
@@ -67,7 +65,7 @@ JumpList::JumpList(int size, const string* arr) {
 }
 
 JumpList::~JumpList() {
-	while(head_ != nullptr){
+	while(head_ != nullptr){ //loop through nodes and deletes
 		if (head_ == nullptr) return;
 		Node* toBeDeleted = head_;
 		head_ = head_->next_;
@@ -75,9 +73,8 @@ JumpList::~JumpList() {
 	}
 }
 
-
 int JumpList::size() const {
-	int counter =0;
+	int counter =0; //loops through nodes with a counter to return sizw
 	Node * currentNode = head_;
     while (currentNode != nullptr) {
         counter++;
@@ -86,9 +83,8 @@ int JumpList::size() const {
 	return counter;
 }
 
-// DONE FOR YOU, DO NOT CHANGE
 bool JumpList::find(const string& s) const {
-
+	// DONE FOR YOU, DO NOT CHANGE
 	if (head_ == nullptr) return false;
 
 	// moving along the fast lane
@@ -100,7 +96,6 @@ bool JumpList::find(const string& s) const {
 
 	// now slow lane
 	while(tmp != nullptr) {
-
 		if (tmp->data_ == s) return true; // match
 		else if (tmp->data_ > s) return false; // went past without finding s
 		else tmp = tmp->next_;
@@ -110,20 +105,20 @@ bool JumpList::find(const string& s) const {
 
 string JumpList::get(int i) const {
 	string output = "";
-	if (i < 0 || i >= size()) {
+	if (i < 0 || i >= size()) {//bounds
 		return output;
 	}
 	int index=0;
 	Node* tmp = head_;
-	while(tmp->jump_ != nullptr&& tmp->gap_ + index <= i) {
+	while(tmp->jump_ != nullptr&& tmp->gap_ + index <= i) {//fast lane adds gap to index
 		index +=tmp->gap_;
 		tmp = tmp->jump_;
 	}
-	while(tmp != nullptr && index < i) {
+	while(tmp != nullptr && index < i) {//slow lane
 		tmp = tmp->next_;
 		index++;
 	}
-	if(tmp != nullptr &&index==i) {
+	if(tmp != nullptr &&index==i) {//retrieve node data when index is reawched
 		output=tmp->data_;
 	}
 
@@ -139,9 +134,9 @@ string JumpList::print() const {
 
 	Node* tmp = head_;
 
-	while (tmp != nullptr) {
-		nodeStr += tmp->data_ + " ";
-		if (tmp->gap_ != 0 || tmp->jump_ != nullptr) {
+	while (tmp != nullptr) {//loop through list of nodes
+		nodeStr += tmp->data_ + " "; // adds
+		if (tmp->gap_ != 0 || tmp->jump_ != nullptr) {//cgeck if its a jump node and adds data+gap to strings
 			jmpNodeStr += tmp->data_ + " ";
 			jmpNodeGapStr += std::to_string(tmp->gap_) + " ";
 		}
@@ -151,89 +146,88 @@ string JumpList::print() const {
 
 }
 
-string JumpList::prettyPrint() const {
-	if (head_ == nullptr) return "";
+string JumpList::prettyPrint() const {//im sorry to whoever has to follow this :/
+    if (head_ == nullptr) return "";
 
-	string nodeStr;
-	string jmpNodeStr;
-	string jmpNodeGapStr;
-	Node* tmp = head_;
-	const int distanceBetweenNodes = 5;// space for the " --> "
-	const int space = 3;
-	int nodeSize = 0;    // tracks size of total node strings
-	int nodeGap = 0;
-	while (tmp != nullptr) {
-		if(tmp->gap_ ==0 && tmp->next_!=nullptr) {
-			nodeSize += tmp->data_.size();
-		}
-		if (tmp == head_) {
-			nodeStr += tmp->data_;
-		} else {
-			nodeStr += " --> " + tmp->data_;
-		}
-		if (tmp->gap_ != 0 || tmp->jump_ != nullptr) {
-			if (tmp == head_) {
-				nodeGap = tmp->gap_;
-				jmpNodeStr += tmp->data_;
-				jmpNodeGapStr += std::to_string(tmp->gap_);
-			} else {
-				int distanceBetweenJumpNodes = nodeGap * distanceBetweenNodes + nodeSize;
-				jmpNodeGapStr += std::string(distanceBetweenJumpNodes, ' ') +std::to_string(tmp->gap_);
-				distanceBetweenJumpNodes -= space;
-				// add a dashed line to represent the jump distance
-				jmpNodeStr += " " + std::string(distanceBetweenJumpNodes, '-') + "> ";
-				jmpNodeStr += tmp->data_;
-				nodeGap = tmp->gap_;
-			}
-			nodeSize=0;
-		}
-		tmp = tmp->next_;
-	}
-	return nodeStr + "\n" + jmpNodeStr + "\n" + jmpNodeGapStr;
+    string nodeStr;
+    string jmpNodeStr;
+    string jmpNodeGapStr;
+
+    Node* tmp = head_;
+    const int distanceBetweenNodes = 5;  // size of" --> "
+    const int space = 3;   // accounts for space before and after the arrow head (">")
+
+    int nodeSize = 0;
+    int nodeGap = 0;
+
+    while (tmp != nullptr) {
+        if (tmp->gap_ == 0 && tmp->next_ != nullptr) {//adds size of all non jumpnode strings
+            nodeSize += tmp->data_.size();
+        }
+        if (tmp == head_) {//head is a special case so...
+            nodeStr += tmp->data_;
+        } else {
+            nodeStr += " --> " + tmp->data_;  // add separator and node data
+        }
+
+        if (tmp->gap_ != 0 || tmp->jump_ != nullptr) {//looks for jumpnodes
+            if (tmp == head_) {
+                nodeGap = tmp->gap_;
+                jmpNodeStr += tmp->data_;  // start building the jump node line with the first node
+                jmpNodeGapStr += std::to_string(tmp->gap_);
+            } else {
+                int distanceBetweenJumpNodes = nodeGap * distanceBetweenNodes + nodeSize;//this took me 2 hours to figure out :|
+                jmpNodeGapStr += std::string(distanceBetweenJumpNodes, ' ') + std::to_string(tmp->gap_);
+                distanceBetweenJumpNodes -= space;// gets the actual hyphen length to make arrow
+                jmpNodeStr += " " + std::string(distanceBetweenJumpNodes, '-') + "> " + tmp->data_; //makes arrow from one jump to next
+                nodeGap = tmp->gap_;
+            }
+            nodeSize = 0;//resets for the next jumpnode arrow calculation
+        }
+        tmp = tmp->next_;
+    }
+
+    return nodeStr + "\n" + jmpNodeStr + "\n" + jmpNodeGapStr;
 }
 
-bool JumpList::insert(const string& data) {
-	Node* temporaryNode = head_;
-	Node* previousNode;
-	Node* previousJumpNode;
 
-	if(find(data)) {
+bool JumpList::insert(const string& s) {
+	if(find(s)) {
 		return false;
 	}
 
-	//find location for alphabet
+	Node* tmp = head_;
+	Node* prevJumpNode = nullptr;
 
-	//setup
-	while(temporaryNode != nullptr) {
-		if (temporaryNode->gap_ != 0 || temporaryNode->jump_ != nullptr) {
-			if(temporaryNode->data_ < data) {
-				previousJumpNode= temporaryNode;
-				if(previousJumpNode->gap_ <5){
-					previousJumpNode->gap_ += 1;
-				}else if(previousJumpNode->gap_ >=5) {
-
-				}
-			}
-		}
-		if(temporaryNode->data_ < data) {
-			if(temporaryNode->data_ == data) {
-				previousNode = temporaryNode;
-				Node nodeToInsert = Node(data, previousNode->next_, nullptr, 0);
-				Node* nodeToInsertMutable = &nodeToInsert;
-			}
-		}
-		temporaryNode = temporaryNode->next_;
+	while(tmp->jump_ != nullptr&& tmp->jump_->data_ < s) {
+		tmp = tmp->jump_;
+		prevJumpNode = tmp;
 	}
+
+	while(tmp != nullptr && tmp->next_ && tmp->next_->data_ < s) {
+		tmp = tmp->next_;
+	}
+	Node *prevNode = tmp;
+
+	Node* newNode = new Node(s, prevNode->next_, nullptr, 0);
+	prevNode->next_ = newNode;
+
+	if(prevJumpNode!= nullptr) {
+		prevJumpNode->gap_ ++;
+	}
+
+	return true;
+
+
 }
 
-
 bool JumpList::erase(const string& s) {
-	// IMPLEMENT ME
 
 	return false; // dummy
 }
 
 int main() {
 	JumpList jl(10);
-	std::cout<<jl.prettyPrint();
+
+	std::cout<<jl.find("C");;
 }
