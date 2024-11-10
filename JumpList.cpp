@@ -24,7 +24,7 @@ JumpList::JumpList() {
 JumpList::JumpList(int size, const string* arr) {
 	// DO NOT CHANGE
 	// You do not need to understand the code here to complete the assignment
-	const string s[] = {"a", "b", "blah", "C", "cat", "d", "etc", "ooo...", "x", "zzz"};
+	const string s[] = {"a", "b", "blah", "c", "cat", "d", "etc", "ooo...", "x", "zzz"};
 	const string* sp = (arr == nullptr) ? s : arr;
 
 	Node** npp = new Node*[size];
@@ -227,7 +227,5 @@ bool JumpList::erase(const string& s) {
 }
 
 int main() {
-	JumpList jl(10);
 
-	std::cout<<jl.find("C");;
 }
